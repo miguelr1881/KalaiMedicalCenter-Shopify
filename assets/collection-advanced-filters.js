@@ -16,11 +16,15 @@ document.addEventListener('DOMContentLoaded', () => {
       .trim();
   };
 
-  const extractCategoryValues = (tags) => {
+  const extractCategoryValues = (tags, vendor) => {
     const values = [];
+    const normalizedVendor = normalize(vendor);
+
     for (const tag of tags) {
       const normalizedTag = normalize(tag);
       if (!normalizedTag) continue;
+      if (normalizedVendor && normalizedTag === normalizedVendor) continue;
+      if (normalizedTag.startsWith('marca:') || normalizedTag.startsWith('brand:')) continue;
 
       if (normalizedTag.startsWith('categoria:')) {
         values.push(normalizedTag.replace(/^categoria:/, '').trim());
@@ -30,6 +34,7 @@ document.addEventListener('DOMContentLoaded', () => {
         values.push(normalizedTag);
       }
     }
+
     return [...new Set(values.filter(Boolean))];
   };
 
@@ -67,7 +72,7 @@ document.addEventListener('DOMContentLoaded', () => {
     productItems.forEach((item) => {
       const tags = String(item.dataset.productTags || '').split(',').map((tag) => tag.trim());
       const vendor = item.dataset.productBrand || '';
-      const categoryValues = extractCategoryValues(tags);
+      const categoryValues = extractCategoryValues(tags, vendor);
       const brandValues = extractBrandValues(tags, vendor);
 
       const categoryMatch = matchesSelectedValues(state.category, categoryValues);

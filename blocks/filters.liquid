@@ -280,13 +280,9 @@
                         unless category_values contains tag_name
                           assign category_values = category_values | append: '|' | append: tag_name
                         endunless
-                      elsif tag_value != blank
-                        unless brand_values contains tag_value
-                          unless product.vendor != blank and product.vendor == tag_value
-                            unless category_values contains tag_value
-                              assign category_values = category_values | append: '|' | append: tag_value
-                            endunless
-                          endunless
+                      elsif tag_value != blank and product.vendor != blank and tag_value != product.vendor
+                        unless category_values contains tag_value
+                          assign category_values = category_values | append: '|' | append: tag_value
                         endunless
                       endif
                     endfor
