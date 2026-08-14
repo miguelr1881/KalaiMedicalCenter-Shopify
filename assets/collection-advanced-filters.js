@@ -21,10 +21,13 @@ document.addEventListener('DOMContentLoaded', () => {
     for (const tag of tags) {
       const normalizedTag = normalize(tag);
       if (!normalizedTag) continue;
+
       if (normalizedTag.startsWith('categoria:')) {
         values.push(normalizedTag.replace(/^categoria:/, '').trim());
       } else if (normalizedTag.startsWith('category:')) {
         values.push(normalizedTag.replace(/^category:/, '').trim());
+      } else {
+        values.push(normalizedTag);
       }
     }
     return [...new Set(values.filter(Boolean))];

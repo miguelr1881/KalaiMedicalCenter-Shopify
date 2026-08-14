@@ -244,7 +244,7 @@
                 {%- endfor -%}
 
                 {% liquid
-                  assign category_filter_list = 'Aceite capilar|Aceites corporales|Acné|Aminoácidos|antienvejecimiento|Antitranspirante|Bloqueador|Bálsamo corporal|Bálsamo labial|Champú|Contorno de ojos|Crema|Crema para manos|Desmaquillantes|Desodorante|Gel|Hidratante|Humectante|Iluminador|Limpiador facial|Locion|Mascarillas|Mascarillas labiales|Peeling capilar|Perfume capilar|Protector solar|Protector termico|Spray facial|Sérums capilares|Sérums faciales|Tónico|Tratamiento contra caída del cabello'
+                  assign category_values = ''
                   assign brand_values = ''
 
                   for product in collection.products
@@ -257,6 +257,7 @@
 
                     for tag in product.tags
                       assign tag_value = tag | strip
+
                       if tag_value contains 'marca:'
                         assign tag_name = tag_value | split: ':' | last | strip
                         unless brand_values contains tag_name
@@ -266,6 +267,26 @@
                         assign tag_name = tag_value | split: ':' | last | strip
                         unless brand_values contains tag_name
                           assign brand_values = brand_values | append: '|' | append: tag_name
+                        endunless
+                      endif
+
+                      if tag_value contains 'categoria:'
+                        assign tag_name = tag_value | split: ':' | last | strip
+                        unless category_values contains tag_name
+                          assign category_values = category_values | append: '|' | append: tag_name
+                        endunless
+                      elsif tag_value contains 'category:'
+                        assign tag_name = tag_value | split: ':' | last | strip
+                        unless category_values contains tag_name
+                          assign category_values = category_values | append: '|' | append: tag_name
+                        endunless
+                      elsif tag_value != blank
+                        unless brand_values contains tag_value
+                          unless product.vendor != blank and product.vendor == tag_value
+                            unless category_values contains tag_value
+                              assign category_values = category_values | append: '|' | append: tag_value
+                            endunless
+                          endunless
                         endunless
                       endif
                     endfor
@@ -282,7 +303,7 @@
                     </summary>
                     <div class="facets__inputs facets__panel-content details-content">
                       <div class="facets__inputs-wrapper facets__inputs-wrapper--row" style="padding-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;">
-                        {% assign category_list = category_filter_list | split: '|' | sort %}
+                        {% assign category_list = category_values | split: '|' | sort %}
                         {% for item in category_list %}
                           {% assign cleaned_item = item | strip %}
                           {% if cleaned_item != blank %}
@@ -583,92 +604,6 @@
                   {% endcase %}
                 {%- endfor -%}
 
-                {% liquid
-                  assign category_filter_list = 'Aceite capilar|Aceites corporales|Acné|Aminoácidos|antienvejecimiento|Antitranspirante|Bloqueador|Bálsamo corporal|Bálsamo labial|Champú|Contorno de ojos|Crema|Crema para manos|Desmaquillantes|Desodorante|Gel|Hidratante|Humectante|Iluminador|Limpiador facial|Locion|Mascarillas|Mascarillas labiales|Peeling capilar|Perfume capilar|Protector solar|Protector termico|Spray facial|Sérums capilares|Sérums faciales|Tónico|Tratamiento contra caída del cabello'
-                  assign brand_values = ''
-
-                  for product in collection.products
-                    if product.vendor != blank
-                      assign vendor_name = product.vendor | strip
-                      unless brand_values contains vendor_name
-                        assign brand_values = brand_values | append: '|' | append: vendor_name
-                      endunless
-                    endif
-
-                    for tag in product.tags
-                      assign tag_value = tag | strip
-                      if tag_value contains 'marca:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless brand_values contains tag_name
-                          assign brand_values = brand_values | append: '|' | append: tag_name
-                        endunless
-                      elsif tag_value contains 'brand:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless brand_values contains tag_name
-                          assign brand_values = brand_values | append: '|' | append: tag_name
-                        endunless
-                      endif
-                    endfor
-                  endfor
-                %}
-
-                {% if category_filter_list != blank or brand_values != blank %}
-                  <div class="collection-custom-filters" data-collection-custom-filter="category">
-                    <details class="facets__panel" open>
-                      <summary class="facets__summary">
-                        <span class="facets__label">Categorías</span>
-                        <div class="facets__status-wrapper">
-                          <span class="svg-wrapper icon-caret icon-animated">
-                            {{- 'icon-caret.svg' | inline_asset_content -}}
-                          </span>
-                        </div>
-                      </summary>
-                      <div class="facets__inputs facets__panel-content details-content">
-                        <div class="facets__inputs-wrapper facets__inputs-wrapper--row" style="padding-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;">
-                          {% assign category_list = category_filter_list | split: '|' | sort %}
-                          {% for item in category_list %}
-                            {% assign cleaned_item = item | strip %}
-                            {% if cleaned_item != blank %}
-                              <label class="facets__inputs-list-item" style="display: flex; align-items: center; gap: 0.5rem; min-height: 2rem; color: rgba(var(--color-foreground-rgb), 0.8);">
-                                <input type="checkbox" name="category" value="{{ cleaned_item | escape }}" />
-                                <span>{{ cleaned_item }}</span>
-                              </label>
-                            {% endif %}
-                          {% endfor %}
-                        </div>
-                      </div>
-                    </details>
-                    <button type="button" data-clear-collection-filters class="button-unstyled facets__clear-all-link" style="margin-top: 0.75rem;">Limpiar</button>
-                  </div>
-
-                  <div class="collection-custom-filters" data-collection-custom-filter="brand">
-                    <details class="facets__panel" open>
-                      <summary class="facets__summary">
-                        <span class="facets__label">Marcas</span>
-                        <div class="facets__status-wrapper">
-                          <span class="svg-wrapper icon-caret icon-animated">
-                            {{- 'icon-caret.svg' | inline_asset_content -}}
-                          </span>
-                        </div>
-                      </summary>
-                      <div class="facets__inputs facets__panel-content details-content">
-                        <div class="facets__inputs-wrapper facets__inputs-wrapper--row" style="padding-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;">
-                          {% assign brand_list = brand_values | split: '|' | sort %}
-                          {% for item in brand_list %}
-                            {% assign cleaned_item = item | strip %}
-                            {% if cleaned_item != blank %}
-                              <label class="facets__inputs-list-item" style="display: flex; align-items: center; gap: 0.5rem; min-height: 2rem; color: rgba(var(--color-foreground-rgb), 0.8);">
-                                <input type="checkbox" name="brand" value="{{ cleaned_item | escape }}" />
-                                <span>{{ cleaned_item }}</span>
-                              </label>
-                            {% endif %}
-                          {% endfor %}
-                        </div>
-                      </div>
-                    </details>
-                    <button type="button" data-clear-collection-filters class="button-unstyled facets__clear-all-link" style="margin-top: 0.75rem;">Limpiar</button>
-                  </div>
-                {% endif %}
               </div>
             {% endif %}
 
