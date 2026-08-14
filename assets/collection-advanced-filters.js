@@ -45,6 +45,14 @@ document.addEventListener('DOMContentLoaded', () => {
     return [...new Set(values.filter(Boolean))];
   };
 
+  const matchesSelectedValues = (selectedValues, productValues) => {
+    if (selectedValues.size === 0) return true;
+    return [...selectedValues].some((selected) => {
+      const normalizedSelected = normalize(selected);
+      return productValues.some((value) => normalize(value) === normalizedSelected);
+    });
+  };
+
   const state = {
     category: new Set(),
     brand: new Set(),
@@ -59,13 +67,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const categoryValues = extractCategoryValues(tags);
       const brandValues = extractBrandValues(tags, vendor);
 
-      const categoryMatch =
-        state.category.size === 0 ||
-        [...state.category].some((selected) => categoryValues.includes(normalize(selected)));
-
-      const brandMatch =
-        state.brand.size === 0 ||
-        [...state.brand].some((selected) => brandValues.includes(normalize(selected)));
+      const categoryMatch = matchesSelectedValues(state.category, categoryValues);
+      const brandMatch = matchesSelectedValues(state.brand, brandValues);
 
       const shouldShow = categoryMatch && brandMatch;
       item.hidden = !shouldShow;
