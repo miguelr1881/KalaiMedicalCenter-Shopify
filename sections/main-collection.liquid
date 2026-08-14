@@ -5,11 +5,6 @@
   type="module"
   fetchpriority="low"
 ></script>
-<script
-  src="{{ 'collection-advanced-filters.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
 
 {% javascript %}
   const url = new URL(window.location.href);
@@ -52,71 +47,6 @@
     <div
       class="collection-wrapper grid gap-style{% if section.settings.product_grid_width == 'full-width' %} collection-wrapper--grid-full-width{% endif %}"
     >
-      {% liquid
-        assign category_options = ''
-        assign brand_options = ''
-
-        for product in collection.products
-          for tag in product.tags
-            assign tag_value = tag | strip
-            if tag_value contains 'categoria:'
-              assign tag_name = tag_value | split: ':' | last | strip
-              unless category_options contains tag_name
-                assign category_options = category_options | append: '|' | append: tag_name
-              endunless
-            elsif tag_value contains 'category:'
-              assign tag_name = tag_value | split: ':' | last | strip
-              unless category_options contains tag_name
-                assign category_options = category_options | append: '|' | append: tag_name
-              endunless
-            elsif tag_value contains 'marca:'
-              assign tag_name = tag_value | split: ':' | last | strip
-              unless brand_options contains tag_name
-                assign brand_options = brand_options | append: '|' | append: tag_name
-              endunless
-            elsif tag_value contains 'brand:'
-              assign tag_name = tag_value | split: ':' | last | strip
-              unless brand_options contains tag_name
-                assign brand_options = brand_options | append: '|' | append: tag_name
-              endunless
-            endif
-          endfor
-
-          if product.vendor != blank
-            assign vendor_name = product.vendor | strip
-            unless brand_options contains vendor_name
-              assign brand_options = brand_options | append: '|' | append: vendor_name
-            endunless
-          endif
-        endfor
-      %}
-
-      <div
-        class="collection-advanced-filters"
-        data-collection-filter-panel
-        data-category-options="{{ category_options | escape_attr }}"
-        data-brand-options="{{ brand_options | escape_attr }}"
-      >
-        <div class="collection-advanced-filters__header">
-          <h3>Filtrar</h3>
-          <button type="button" class="collection-advanced-filters__clear" data-clear-filters>
-            Limpiar
-          </button>
-        </div>
-
-        <div class="collection-advanced-filters__groups">
-          <div class="collection-advanced-filters__group">
-            <h4>Categorías</h4>
-            <div data-filter-group="category"></div>
-          </div>
-
-          <div class="collection-advanced-filters__group">
-            <h4>Marcas</h4>
-            <div data-filter-group="brand"></div>
-          </div>
-        </div>
-      </div>
-
       {% content_for 'block',
         type: 'filters',
         id: 'filters',
@@ -163,94 +93,6 @@
     </div>
   </results-list>
 </collection-component>
-
-{% style %}
-  .collection-advanced-filters {
-    grid-column: 1 / -1;
-    margin: 0 0 1.5rem;
-    padding: 1rem 1.25rem;
-    border: 1px solid rgba(var(--color-foreground-rgb), 0.12);
-    border-radius: 0.75rem;
-    background: rgba(var(--color-background-rgb), 0.6);
-  }
-
-  .collection-advanced-filters__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    margin-bottom: 1rem;
-  }
-
-  .collection-advanced-filters__header h3,
-  .collection-advanced-filters__group h4 {
-    margin: 0;
-    font-size: 1rem;
-    font-weight: 600;
-  }
-
-  .collection-advanced-filters__clear {
-    border: 0;
-    background: transparent;
-    color: rgba(var(--color-foreground-rgb), 0.8);
-    cursor: pointer;
-    font: inherit;
-    padding: 0;
-  }
-
-  .collection-advanced-filters__clear:disabled {
-    opacity: 0.45;
-    cursor: not-allowed;
-  }
-
-  .collection-advanced-filters__groups {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-    gap: 1rem 1.5rem;
-  }
-
-  .collection-advanced-filters__group {
-    display: flex;
-    flex-direction: column;
-    gap: 0.6rem;
-  }
-
-  .collection-advanced-filters__group > div {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 0.75rem;
-  }
-
-  .collection-advanced-filters__item {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.5rem;
-    min-height: 2rem;
-    cursor: pointer;
-    color: rgba(var(--color-foreground-rgb), 0.85);
-    font-size: 0.95rem;
-  }
-
-  .collection-advanced-filters__item input {
-    accent-color: rgb(var(--color-foreground-rgb));
-  }
-
-  .collection-advanced-filters__empty {
-    margin: 0;
-    color: rgba(var(--color-foreground-rgb), 0.6);
-  }
-
-  @media screen and (max-width: 749px) {
-    .collection-advanced-filters {
-      padding: 0.9rem 0.9rem 1rem;
-    }
-
-    .collection-advanced-filters__header {
-      align-items: flex-start;
-      flex-direction: column;
-    }
-  }
-{% endstyle %}
 
 {% schema %}
 {
