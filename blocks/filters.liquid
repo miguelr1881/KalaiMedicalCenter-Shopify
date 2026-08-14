@@ -18,12 +18,6 @@
 ></script>
 
 <script
-  src="{{ 'collection-advanced-filters.js' | asset_url }}"
-  type="module"
-  fetchpriority="low"
-></script>
-
-<script
   src="{{ 'scrolling.js' | asset_url }}"
   type="module"
   fetchpriority="low"
@@ -242,104 +236,6 @@
                       %}
                   {% endcase %}
                 {%- endfor -%}
-
-                {% liquid
-                  assign category_values = ''
-                  assign brand_values = ''
-
-                  for product in collection.products
-                    if product.vendor != blank
-                      assign vendor_name = product.vendor | strip
-                      unless brand_values contains vendor_name
-                        assign brand_values = brand_values | append: '|' | append: vendor_name
-                      endunless
-                    endif
-
-                    for tag in product.tags
-                      assign tag_value = tag | strip
-
-                      if tag_value contains 'marca:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless brand_values contains tag_name
-                          assign brand_values = brand_values | append: '|' | append: tag_name
-                        endunless
-                      elsif tag_value contains 'brand:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless brand_values contains tag_name
-                          assign brand_values = brand_values | append: '|' | append: tag_name
-                        endunless
-                      endif
-
-                      if tag_value contains 'categoria:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless category_values contains tag_name
-                          assign category_values = category_values | append: '|' | append: tag_name
-                        endunless
-                      elsif tag_value contains 'category:'
-                        assign tag_name = tag_value | split: ':' | last | strip
-                        unless category_values contains tag_name
-                          assign category_values = category_values | append: '|' | append: tag_name
-                        endunless
-                      elsif tag_value != blank and product.vendor != blank and tag_value != product.vendor
-                        unless category_values contains tag_value
-                          assign category_values = category_values | append: '|' | append: tag_value
-                        endunless
-                      endif
-                    endfor
-                  endfor
-                %}
-
-                <div class="collection-custom-filters" data-collection-custom-filter="category">
-                  <details class="facets__panel" open>
-                    <summary class="facets__summary">
-                      <span class="facets__label">Categorías</span>
-                      <div class="facets__status-wrapper">
-                        <span class="svg-wrapper icon-caret icon-animated">{{ 'icon-caret.svg' | inline_asset_content }}</span>
-                      </div>
-                    </summary>
-                    <div class="facets__inputs facets__panel-content details-content">
-                      <div class="facets__inputs-wrapper facets__inputs-wrapper--row" style="padding-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;">
-                        {% assign category_list = category_values | split: '|' | sort %}
-                        {% for item in category_list %}
-                          {% assign cleaned_item = item | strip %}
-                          {% if cleaned_item != blank %}
-                            <label class="facets__inputs-list-item" style="display: flex; align-items: center; gap: 0.5rem; min-height: 2rem; color: rgba(var(--color-foreground-rgb), 0.8);">
-                              <input type="checkbox" name="category" value="{{ cleaned_item | escape }}" />
-                              <span>{{ cleaned_item }}</span>
-                            </label>
-                          {% endif %}
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </details>
-                  <button type="button" data-clear-collection-filters class="button-unstyled facets__clear-all-link" style="margin-top: 0.75rem;">Limpiar</button>
-                </div>
-
-                <div class="collection-custom-filters" data-collection-custom-filter="brand">
-                  <details class="facets__panel" open>
-                    <summary class="facets__summary">
-                      <span class="facets__label">Marcas</span>
-                      <div class="facets__status-wrapper">
-                        <span class="svg-wrapper icon-caret icon-animated">{{ 'icon-caret.svg' | inline_asset_content }}</span>
-                      </div>
-                    </summary>
-                    <div class="facets__inputs facets__panel-content details-content">
-                      <div class="facets__inputs-wrapper facets__inputs-wrapper--row" style="padding-top: 0.5rem; display: flex; flex-wrap: wrap; gap: 0.5rem 0.8rem;">
-                        {% assign brand_list = brand_values | split: '|' | sort %}
-                        {% for item in brand_list %}
-                          {% assign cleaned_item = item | strip %}
-                          {% if cleaned_item != blank %}
-                            <label class="facets__inputs-list-item" style="display: flex; align-items: center; gap: 0.5rem; min-height: 2rem; color: rgba(var(--color-foreground-rgb), 0.8);">
-                              <input type="checkbox" name="brand" value="{{ cleaned_item | escape }}" />
-                              <span>{{ cleaned_item }}</span>
-                            </label>
-                          {% endif %}
-                        {% endfor %}
-                      </div>
-                    </div>
-                  </details>
-                  <button type="button" data-clear-collection-filters class="button-unstyled facets__clear-all-link" style="margin-top: 0.75rem;">Limpiar</button>
-                </div>
               {% endcapture %}
 
               <div class="facets__filters-wrapper">
@@ -599,7 +495,6 @@
                       %}
                   {% endcase %}
                 {%- endfor -%}
-
               </div>
             {% endif %}
 
@@ -862,7 +757,6 @@
     flex-direction: column;
     gap: var(--padding-lg);
     width: 100%;
-    padding-block-end: 0.25rem;
   }
 
   :is(.facets--drawer, .facets--vertical) .facets__inputs:not(:has(.show-more)) {
@@ -928,93 +822,10 @@
     font-size: var(--font-h5--size);
     display: flex;
     justify-content: space-between;
-    align-items: center;
-    padding-block: 0.35rem;
-    border-top: 1px solid rgba(var(--color-foreground-rgb) / 0.12);
-    border-bottom: 1px solid transparent;
-    transition: opacity 0.2s ease, border-color 0.2s ease;
 
     &:hover {
       --icon-opacity: 1;
     }
-  }
-
-  .facets__panel[open] .facets__summary {
-    border-bottom-color: rgba(var(--color-foreground-rgb) / 0.12);
-  }
-
-  .facets__summary::-webkit-details-marker {
-    display: none;
-  }
-
-  .facets__label {
-    font-size: 0.8rem;
-    line-height: 1.2;
-    letter-spacing: 0.14em;
-    text-transform: uppercase;
-    font-weight: 600;
-    color: rgb(var(--color-foreground-rgb) / 0.9);
-  }
-
-  .facets__status-wrapper {
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    min-width: 18px;
-    color: rgb(var(--color-foreground-rgb) / 0.7);
-  }
-
-  .facets__status {
-    font-size: 0.8rem;
-    letter-spacing: 0.02em;
-    color: rgb(var(--color-foreground-rgb) / 0.7);
-  }
-
-  .facets__inputs-wrapper {
-    margin-block: 0.5rem 0;
-  }
-
-  .facets__inputs-list-item,
-  .collection-custom-filters .facets__inputs-list-item {
-    display: flex;
-    align-items: center;
-    gap: 0.7rem;
-    min-height: 2rem;
-    padding: 0.35rem 0;
-    color: rgb(var(--color-foreground-rgb) / 0.8);
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
-
-  .facets__inputs-list-item input[type='checkbox'],
-  .collection-custom-filters input[type='checkbox'] {
-    width: 15px;
-    height: 15px;
-    margin: 0;
-    accent-color: rgb(var(--color-foreground-rgb));
-    border-radius: 4px;
-    cursor: pointer;
-  }
-
-  .facets__inputs-list-item span,
-  .collection-custom-filters .facets__inputs-list-item span {
-    color: rgb(var(--color-foreground-rgb) / 0.8);
-  }
-
-  .facets__inputs-list-item--disabled,
-  .facets__inputs-list-item--disabled span {
-    opacity: 0.45;
-  }
-
-  .facets__panel-content {
-    padding-inline: 0;
-  }
-
-  .facets__inputs .facets__inputs-list--grid,
-  .collection-custom-filters .facets__inputs-wrapper--row {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.35rem 0.8rem;
   }
 
   .facets__filters-wrapper:hover .facets__summary,

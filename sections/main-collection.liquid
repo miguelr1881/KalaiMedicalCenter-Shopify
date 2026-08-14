@@ -68,8 +68,6 @@
               class="product-grid__item product-grid__item--{{ forloop.index0 }}"
               data-page="{{ paginate.current_page }}"
               data-product-id="{{ product.id }}"
-              data-product-tags="{{ product.tags | join: ',' | escape }}"
-              data-product-brand="{{ product.vendor | escape }}"
               ref="cards[]"
             >
               {% content_for 'block',
