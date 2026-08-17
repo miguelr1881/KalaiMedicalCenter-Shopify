@@ -117,7 +117,7 @@
               "type": "variant-picker",
               "name": "t:names.product_variant_picker",
               "settings": {
-                "variant_style": "dropdowns",
+                "variant_style": "buttons",
                 "show_swatches": true,
                 "option_label_text_color": "",
                 "variant_style_class": "custom",
