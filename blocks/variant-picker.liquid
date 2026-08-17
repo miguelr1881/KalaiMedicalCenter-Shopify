@@ -8,11 +8,11 @@
 -%}
 
 {% unless product_resource == blank %}
-  {% unless product_resource.has_only_default_variant %}
+  {% if product_resource.variants.size == 1 and product_resource.variants.first.title == 'Default Title' %}
+  {% else %}
     {% render 'variant-main-picker', product_resource: product_resource, section: section, product: product %}
-  {% endunless %}
+  {% endif %}
 {% endunless %}
-
 
 {% schema %}
 {
