@@ -8,8 +8,11 @@
 -%}
 
 {% unless product_resource == blank %}
-  {% render 'variant-main-picker', product_resource: product_resource, section: section, product: product %}
+  {% unless product_resource.has_only_default_variant %}
+    {% render 'variant-main-picker', product_resource: product_resource, section: section, product: product %}
+  {% endunless %}
 {% endunless %}
+
 
 {% schema %}
 {
